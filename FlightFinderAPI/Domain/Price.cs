@@ -6,7 +6,7 @@ public class Price
 {
 	[JsonPropertyName("currency")] public string Currency { get; set; } = null!;
 
-	[JsonPropertyName("adult")] public decimal Adult { get; set; }
+	[JsonPropertyName("adult")] public float Adult { get; set; }
 
-	[JsonPropertyName("child")] public decimal Child { get; set; }
+	[JsonPropertyName("child")] public float Child { get; set; }
 }
