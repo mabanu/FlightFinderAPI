@@ -19,7 +19,7 @@ public class AppDbContext : DbContext
 			{
 				UserId = new Guid("BF182D5D-8489-48E6-8E87-DD2D90A7FBB6"),
 				Name = "maxi",
-				UserName = "maxi",
+				UserEmail = "maxi@maxi.com",
 				Password = "maxi"
 			});
 

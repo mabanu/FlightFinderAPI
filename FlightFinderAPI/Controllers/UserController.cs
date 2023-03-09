@@ -71,10 +71,11 @@ public class UserController : ControllerBase
 	// POST: api/User
 	// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
 	[HttpPost]
-	public async Task<ActionResult<User>> PostUser(User user)
+	public async Task<ActionResult<User>> PostUser([FromBody] UserCreationDto userCreation)
 	{
 		// ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 		if (_context.Users == null) return Problem("Entity set 'AppDbContext.Users'  is null.");
+		var user = _mapper.Map<User>(userCreation);
 		_context.Users.Add(user);
 		await _context.SaveChangesAsync();
 
@@ -98,6 +99,7 @@ public class UserController : ControllerBase
 
 	private bool UserExists(Guid id)
 	{
+		// ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
 		return (_context.Users?.Any(e => e.UserId == id)).GetValueOrDefault();
 	}
 }

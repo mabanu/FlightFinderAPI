@@ -20,6 +20,7 @@ public class BookingController : ControllerBase
 	[HttpGet]
 	public async Task<ActionResult<IEnumerable<Booking>>> GetBookings()
 	{
+		// ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 		if (_context.Bookings == null) return NotFound();
 		return await _context.Bookings.ToListAsync();
 	}
@@ -28,6 +29,7 @@ public class BookingController : ControllerBase
 	[HttpGet("{id}")]
 	public async Task<ActionResult<Booking>> GetBooking(Guid id)
 	{
+		// ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 		if (_context.Bookings == null) return NotFound();
 		var booking = await _context.Bookings.FindAsync(id);
 
@@ -64,6 +66,7 @@ public class BookingController : ControllerBase
 	[HttpPost]
 	public async Task<ActionResult<Booking>> PostBooking(Booking booking)
 	{
+		// ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 		if (_context.Bookings == null) return Problem("Entity set 'AppDbContext.Bookings'  is null.");
 		_context.Bookings.Add(booking);
 		await _context.SaveChangesAsync();
@@ -75,6 +78,7 @@ public class BookingController : ControllerBase
 	[HttpDelete("{id}")]
 	public async Task<IActionResult> DeleteBooking(Guid id)
 	{
+		// ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 		if (_context.Bookings == null) return NotFound();
 		var booking = await _context.Bookings.FindAsync(id);
 		if (booking == null) return NotFound();
@@ -87,6 +91,7 @@ public class BookingController : ControllerBase
 
 	private bool BookingExists(Guid id)
 	{
+		// ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
 		return (_context.Bookings?.Any(e => e.BookingId == id)).GetValueOrDefault();
 	}
 }

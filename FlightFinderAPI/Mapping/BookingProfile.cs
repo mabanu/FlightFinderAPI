@@ -19,6 +19,8 @@ public class BookingProfile : Profile
 				opt => opt.MapFrom(src => src.Currency))
 			.ForMember(dest => dest.PriceToPay,
 				opt => opt.MapFrom(src => src.Price))
+			.ForMember(dest => dest.BookingDate,
+				opt => opt.MapFrom(src => DateTime.UtcNow))
 			.ForMember(dest => dest.UserId,
 				opt => opt.MapFrom(src => src.UserId));
 	}

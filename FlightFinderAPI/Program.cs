@@ -1,15 +1,30 @@
 using FlightFinderAPI.Repositories;
 using FlightFinderAPI.Services.Context;
+using FlightFinderAPI.Validation;
+using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Host.UseSerilog((context, service, configuration) => configuration
+	.ReadFrom.Configuration(context.Configuration)
+	.ReadFrom.Services(service)
+	.Enrich.FromLogContext()
+	.WriteTo.Console()
+	.WriteTo.File("Logs/logs.txt", rollingInterval: RollingInterval.Month)
+);
+
 builder.Services.AddSingleton<IFlightData, FlightData>();
 builder.Services.AddCors();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddFluentValidation(opt =>
+{
+	opt.RegisterValidatorsFromAssemblyContaining<Program>();
+	opt.DisableDataAnnotationsValidation = true;
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -34,7 +49,7 @@ app.UseCors(opt => opt
 	.AllowAnyHeader());
 
 app.UseAuthorization();
-
+app.UseMiddleware<ValidationExceptionMiddleware>();
 app.MapControllers();
 
 app.Run();

@@ -2,9 +2,13 @@
 
 public class BookingCreationDto
 {
-	public string RouteId { get; set; }
-	public string FlightId { get; set; }
-	public string Currency { get; set; }
+	public string RouteId { get; set; } = null!;
+	public string FlightId { get; set; } = null!;
+	public string Currency { get; set; } = null!;
+
+	// ReSharper disable once UnusedAutoPropertyAccessor.Global
 	public float Price { get; set; }
+
+	// ReSharper disable once UnusedAutoPropertyAccessor.Global
 	public Guid UserId { get; set; }
 }
