@@ -16,7 +16,7 @@
 
 ---
    
-# FlightFinderAPI     ![](https://img.shields.io/github/last-commit/mabanu/FlightFinderAPI ?style=plastic)
+# FlightFinderAPI     ![](https://img.shields.io/github/last-commit/mabanu/FlightFinderAPI?style=plastic)
 
 <div id="header" align='center'>
    <image src="https://media.giphy.com/media/11kEuHSQAXXiGQ/giphy.gif" alt="Fail">
