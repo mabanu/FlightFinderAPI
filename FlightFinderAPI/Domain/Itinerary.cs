@@ -10,6 +10,8 @@ public class Itinerary
 
 	[JsonPropertyName("arrivalAt")] public DateTime ArrivalAt { get; set; }
 
+	public DateTime AwaitingTime { get; set; }
+
 	[JsonPropertyName("availableSeats")] public int AvailableSeats { get; set; }
 
 	[JsonPropertyName("prices")] public Price Prices { get; set; } = null!;

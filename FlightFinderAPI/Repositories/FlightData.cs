@@ -137,6 +137,7 @@ public class FlightData : IFlightData
 						FlightId = itinerary1.FlightId + "," + itinerary2.FlightId,
 						DepartureAt = itinerary1.DepartureAt,
 						ArrivalAt = itinerary2.ArrivalAt,
+						AwaitingTime = new DateTime(itinerary2.DepartureAt.Ticks - itinerary1.ArrivalAt.Ticks),
 						AvailableSeats = Math.Min(itinerary1.AvailableSeats, itinerary2.AvailableSeats),
 						Prices = new Price
 						{
