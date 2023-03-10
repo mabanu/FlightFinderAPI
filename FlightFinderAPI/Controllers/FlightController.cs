@@ -33,6 +33,17 @@ public class FlightController : ControllerBase
 		return Ok(result);
 	}
 
+	[HttpGet("route-connection")]
+	public ActionResult<List<Flight>> GetFlightConnection([FromQuery] DepartureArrivalRequest request)
+	{
+		var result = _flightData.GetFlightsConnection(request);
+
+		// ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+		if (result == null) return NotFound();
+
+		return Ok(result);
+	}
+
 	[HttpGet("departures")]
 	public ActionResult<List<Flight>> GetFlightsDeparture([FromQuery] string departure)
 	{
