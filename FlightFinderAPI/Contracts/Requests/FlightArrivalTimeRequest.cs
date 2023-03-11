@@ -3,5 +3,5 @@
 public class FlightArrivalTimeRequest
 {
 	public DateTime ArrivalTime { get; set; }
-	public string ArrivalDestination { get; set; }
+	public string ArrivalDestination { get; set; } = null!;
 }
