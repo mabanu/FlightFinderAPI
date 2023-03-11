@@ -20,7 +20,5 @@ public class BookingProfile : Profile
 		CreateMap<Booking, BookingResponse>();
 
 		CreateMap<BookingUpdate, Booking>();
-
 	}
-	
 }

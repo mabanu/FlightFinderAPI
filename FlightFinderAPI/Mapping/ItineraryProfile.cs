@@ -8,6 +8,6 @@ public class ItineraryProfile : Profile
 {
 	public ItineraryProfile()
 	{
-		CreateMap<Itinerary,ItineraryDirectFlightResponse>();
+		CreateMap<Itinerary, ItineraryDirectFlightResponse>();
 	}
 }

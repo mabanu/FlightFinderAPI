@@ -29,7 +29,7 @@ public class UserController : ControllerBase
 		if (_context.Users == null) return NotFound();
 		var allUsers = await _context.Users.ToListAsync();
 		var users = _mapper.Map<IEnumerable<UserDto>>(allUsers);
-		
+
 		return Ok(users);
 	}
 
@@ -47,7 +47,7 @@ public class UserController : ControllerBase
 
 		return Ok(result);
 	}
-	
+
 	[HttpGet("{id}/user-bookings")]
 	public async Task<ActionResult<BookingResponse>> GetBookingOfUser(Guid id)
 	{
@@ -62,7 +62,7 @@ public class UserController : ControllerBase
 
 		return Ok(results);
 	}
-	
+
 	[HttpPut("{id}")]
 	public async Task<IActionResult> PutUser(Guid id, UserUpdate userUpdate)
 	{
@@ -85,7 +85,7 @@ public class UserController : ControllerBase
 
 		return NoContent();
 	}
-	
+
 	[HttpPost]
 	public async Task<ActionResult<UserCreationDto>> PostUser([FromBody] UserCreationDto userCreation)
 	{
@@ -97,7 +97,7 @@ public class UserController : ControllerBase
 
 		return CreatedAtAction("GetUser", new { id = user.UserId }, userCreation);
 	}
-	
+
 	[HttpDelete("{id}")]
 	public async Task<IActionResult> DeleteUser(Guid id)
 	{

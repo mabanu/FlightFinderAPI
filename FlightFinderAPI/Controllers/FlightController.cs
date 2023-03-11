@@ -70,7 +70,8 @@ public class FlightController : ControllerBase
 	}
 
 	[HttpGet("departure-time-routes")]
-	public ActionResult<List<ItineraryDirectFlightResponse>> GetFlightBaseOnDepartureTime([FromQuery] FlightDepartureTimeRequest request)
+	public ActionResult<List<ItineraryDirectFlightResponse>> GetFlightBaseOnDepartureTime(
+		[FromQuery] FlightDepartureTimeRequest request)
 	{
 		var itineraries = _flightData.GetFlightsBaseOnDepartureTime(request);
 
@@ -83,7 +84,8 @@ public class FlightController : ControllerBase
 	}
 
 	[HttpGet("arrival-time-routes")]
-	public ActionResult<List<ItineraryDirectFlightResponse>> GetFlightBaseOnArrivalTime([FromQuery] FlightArrivalTimeRequest request)
+	public ActionResult<List<ItineraryDirectFlightResponse>> GetFlightBaseOnArrivalTime(
+		[FromQuery] FlightArrivalTimeRequest request)
 	{
 		var itineraries = _flightData.GetFlightsBaseOnArrivalTime(request);
 

@@ -32,7 +32,7 @@ public class BookingController : ControllerBase
 		var bookings = await _context.Bookings.ToListAsync();
 
 		var tempBooking = _mapper.Map<IEnumerable<BookingResponse>>(bookings);
-		
+
 		return Ok(tempBooking);
 	}
 

@@ -8,11 +8,11 @@ public class ItineraryDirectFlightResponse
 
 	public string RouteId { get; set; } = null!;
 
-public DateTime DepartureAt { get; set; }
+	public DateTime DepartureAt { get; set; }
 
-public DateTime ArrivalAt { get; set; }
+	public DateTime ArrivalAt { get; set; }
 
-public int AvailableSeats { get; set; }
+	public int AvailableSeats { get; set; }
 
-public Price Prices { get; set; } = null!;
+	public Price Prices { get; set; } = null!;
 }
