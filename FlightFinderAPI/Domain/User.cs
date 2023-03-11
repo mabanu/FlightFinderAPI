@@ -12,5 +12,5 @@ public class User
 
 	[StringLength(60)] [Required] public string Password { get; set; } = null!;
 
-	public ICollection<Booking> BookedFlights { get; set; } = null!;
+	public List<Booking> BookedFlights { get; set; } = null!;
 }

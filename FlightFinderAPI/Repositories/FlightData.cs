@@ -81,8 +81,7 @@ public class FlightData : IFlightData
 	public List<Flight> GetFlightsDeparture(string departure)
 	{
 		var resultsFlight = _flightNoItineraries
-			.Where(flight => flight.DepartureDestination == departure)
-			.ToList();
+			.FindAll(flight => flight.DepartureDestination == departure);
 
 		var results = new List<Flight>();
 
@@ -100,8 +99,7 @@ public class FlightData : IFlightData
 	public List<Flight> GetFlightsArrival(string arrival)
 	{
 		var resultsFlight = _flightNoItineraries
-			.Where(flight => flight.DepartureDestination == arrival)
-			.ToList();
+			.FindAll(flight => flight.ArrivalDestination == arrival);
 
 		var results = new List<Flight>();
 
@@ -137,14 +135,14 @@ public class FlightData : IFlightData
 	public List<Itinerary> GetFlightsBaseOnArrivalTime(FlightArrivalTimeRequest request)
 	{
 		var resultFlights =
-			_flightNoItineraries.FindAll(flight => flight.DepartureDestination == request.ArrivalDestination);
+			_flightNoItineraries.FindAll(flight => flight.ArrivalDestination == request.ArrivalDestination);
 
 		var results = new List<Itinerary>();
 
 		foreach (var flight in resultFlights)
 		{
 			var tempItinerary = _itineraries.FindAll(itinerary =>
-				itinerary.RouteId == flight.RouteId && itinerary.DepartureAt == request.ArrivalTime);
+				itinerary.RouteId == flight.RouteId && itinerary.ArrivalAt == request.ArrivalTime);
 
 			results.AddRange(tempItinerary);
 		}

@@ -1,5 +1,6 @@
 using AutoMapper;
 using FlightFinderAPI.Contracts.Incoming;
+using FlightFinderAPI.Contracts.Responses;
 using FlightFinderAPI.Domain;
 using FlightFinderAPI.Repositories;
 using FlightFinderAPI.Services.Context;
@@ -24,15 +25,19 @@ public class BookingController : ControllerBase
 	}
 
 	[HttpGet]
-	public async Task<ActionResult<IEnumerable<Booking>>> GetBookings()
+	public async Task<ActionResult<IEnumerable<BookingResponse>>> GetBookings()
 	{
 		// ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 		if (_context.Bookings == null) return NotFound();
-		return await _context.Bookings.ToListAsync();
+		var bookings = await _context.Bookings.ToListAsync();
+
+		var tempBooking = _mapper.Map<IEnumerable<BookingResponse>>(bookings);
+		
+		return Ok(tempBooking);
 	}
 
 	[HttpGet("{id}")]
-	public async Task<ActionResult<Booking>> GetBooking(Guid id)
+	public async Task<ActionResult<BookingResponse>> GetBooking(Guid id)
 	{
 		// ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 		if (_context.Bookings == null) return NotFound();
@@ -40,13 +45,17 @@ public class BookingController : ControllerBase
 
 		if (booking == null) return NotFound();
 
-		return booking;
+		var result = _mapper.Map<BookingResponse>(booking);
+
+		return Ok(result);
 	}
 
 	[HttpPut("{id}")]
-	public async Task<IActionResult> PutBooking(Guid id, Booking booking)
+	public async Task<IActionResult> PutBooking(Guid id, BookingUpdate bookingUpdate)
 	{
-		if (id != booking.BookingId) return BadRequest();
+		if (id != bookingUpdate.BookingId) return BadRequest();
+
+		var booking = _mapper.Map<Booking>(bookingUpdate);
 
 		_context.Entry(booking).State = EntityState.Modified;
 
@@ -65,7 +74,7 @@ public class BookingController : ControllerBase
 	}
 
 	[HttpPost]
-	public async Task<ActionResult<List<Booking>>> PostBooking(BookingCreationDto bookingRequest)
+	public async Task<ActionResult<List<BookingResponse>>> PostBooking(BookingCreationDto bookingRequest)
 	{
 		// ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 		if (_context.Bookings == null) return Problem("Entity set 'AppDbContext.Bookings'  is null.");
@@ -84,7 +93,9 @@ public class BookingController : ControllerBase
 			await _context.SaveChangesAsync();
 		}
 
-		return Ok(results);
+		var resultsResponse = _mapper.Map<List<BookingResponse>>(results);
+
+		return Ok(resultsResponse);
 	}
 
 	[HttpDelete("{id}")]

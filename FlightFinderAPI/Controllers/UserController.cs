@@ -29,12 +29,13 @@ public class UserController : ControllerBase
 		if (_context.Users == null) return NotFound();
 		var allUsers = await _context.Users.ToListAsync();
 		var users = _mapper.Map<IEnumerable<UserDto>>(allUsers);
+		
 		return Ok(users);
 	}
 
 	// GET: api/User/5
 	[HttpGet("{id}")]
-	public async Task<ActionResult<User>> GetUser(Guid id)
+	public async Task<ActionResult<UserDto>> GetUser(Guid id)
 	{
 		// ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 		if (_context.Users == null) return NotFound();
@@ -42,15 +43,32 @@ public class UserController : ControllerBase
 
 		if (user == null) return NotFound();
 
-		return user;
-	}
+		var result = _mapper.Map<UserDto>(user);
 
-	// PUT: api/User/5
-	// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-	[HttpPut("{id}")]
-	public async Task<IActionResult> PutUser(Guid id, User user)
+		return Ok(result);
+	}
+	
+	[HttpGet("{id}/user-bookings")]
+	public async Task<ActionResult<BookingResponse>> GetBookingOfUser(Guid id)
 	{
-		if (id != user.UserId) return BadRequest();
+		// ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+		if (_context.Bookings == null) return NotFound();
+
+		var booking = await _context.Bookings
+			.Where(booking => booking.UserId == id)
+			.ToListAsync();
+
+		var results = _mapper.Map<List<BookingResponse>>(booking);
+
+		return Ok(results);
+	}
+	
+	[HttpPut("{id}")]
+	public async Task<IActionResult> PutUser(Guid id, UserUpdate userUpdate)
+	{
+		if (id != userUpdate.UserId) return BadRequest();
+
+		var user = _mapper.Map<User>(userUpdate);
 
 		_context.Entry(user).State = EntityState.Modified;
 
@@ -67,11 +85,9 @@ public class UserController : ControllerBase
 
 		return NoContent();
 	}
-
-	// POST: api/User
-	// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+	
 	[HttpPost]
-	public async Task<ActionResult<User>> PostUser([FromBody] UserCreationDto userCreation)
+	public async Task<ActionResult<UserCreationDto>> PostUser([FromBody] UserCreationDto userCreation)
 	{
 		// ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 		if (_context.Users == null) return Problem("Entity set 'AppDbContext.Users'  is null.");
@@ -79,10 +95,9 @@ public class UserController : ControllerBase
 		_context.Users.Add(user);
 		await _context.SaveChangesAsync();
 
-		return CreatedAtAction("GetUser", new { id = user.UserId }, user);
+		return CreatedAtAction("GetUser", new { id = user.UserId }, userCreation);
 	}
-
-	// DELETE: api/User/5
+	
 	[HttpDelete("{id}")]
 	public async Task<IActionResult> DeleteUser(Guid id)
 	{

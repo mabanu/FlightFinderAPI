@@ -1,4 +1,6 @@
-﻿using FlightFinderAPI.Contracts.Requests;
+﻿using AutoMapper;
+using FlightFinderAPI.Contracts.Requests;
+using FlightFinderAPI.Contracts.Responses;
 using FlightFinderAPI.Domain;
 using FlightFinderAPI.Repositories;
 using Microsoft.AspNetCore.Mvc;
@@ -10,10 +12,12 @@ namespace FlightFinderAPI.Controllers;
 public class FlightController : ControllerBase
 {
 	private readonly IFlightData _flightData;
+	private readonly IMapper _mapper;
 
-	public FlightController(IFlightData flightData)
+	public FlightController(IFlightData flightData, IMapper mapper)
 	{
 		_flightData = flightData;
+		_mapper = mapper;
 	}
 
 	[HttpGet("all")]
@@ -66,23 +70,27 @@ public class FlightController : ControllerBase
 	}
 
 	[HttpGet("departure-time-routes")]
-	public ActionResult<List<Itinerary>> GetFlightBaseOnDepartureTime([FromQuery] FlightDepartureTimeRequest request)
+	public ActionResult<List<ItineraryDirectFlightResponse>> GetFlightBaseOnDepartureTime([FromQuery] FlightDepartureTimeRequest request)
 	{
-		var results = _flightData.GetFlightsBaseOnDepartureTime(request);
+		var itineraries = _flightData.GetFlightsBaseOnDepartureTime(request);
 
 		// ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-		if (results == null) return NotFound();
+		if (itineraries == null) return NotFound();
+
+		var results = _mapper.Map<List<ItineraryDirectFlightResponse>>(itineraries);
 
 		return Ok(results);
 	}
 
 	[HttpGet("arrival-time-routes")]
-	public ActionResult<List<Itinerary>> GetFlightBaseOnArrivalTime([FromQuery] FlightArrivalTimeRequest request)
+	public ActionResult<List<ItineraryDirectFlightResponse>> GetFlightBaseOnArrivalTime([FromQuery] FlightArrivalTimeRequest request)
 	{
-		var results = _flightData.GetFlightsBaseOnArrivalTime(request);
+		var itineraries = _flightData.GetFlightsBaseOnArrivalTime(request);
 
 		// ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-		if (results == null) return NotFound();
+		if (itineraries == null) return NotFound();
+
+		var results = _mapper.Map<List<ItineraryDirectFlightResponse>>(itineraries);
 
 		return Ok(results);
 	}
