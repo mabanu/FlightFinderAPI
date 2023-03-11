@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using FlightFinderAPI.Contracts.Data.Incoming;
 using FlightFinderAPI.Contracts.Requests;
 using FlightFinderAPI.Domain;
 
@@ -9,7 +8,6 @@ public class FlightData : IFlightData
 {
 	private readonly List<FlightNoItinerary> _flightNoItineraries;
 
-	private readonly List<Flight> _flights;
 	private readonly List<Itinerary> _itineraries;
 
 	public FlightData()
@@ -33,7 +31,6 @@ public class FlightData : IFlightData
 			itineraries.AddRange(flight.Itineraries);
 		}
 
-		_flights = flights;
 		_flightNoItineraries = flightNoItinerary;
 		_itineraries = itineraries;
 	}
@@ -80,37 +77,6 @@ public class FlightData : IFlightData
 
 		return results;
 	}
-
-	public List<Flight> GetFlightsConnection(DepartureArrivalRequest request)
-	{
-		var firstConnection = _flights
-			.Where(flight => flight.DepartureDestination == request.DepartureRequest)
-			.ToList();
-		var secondConnection = _flights
-			.Where(flight => flight.ArrivalDestination == request.ArrivalRequest)
-			.ToList();
-
-		var results = new List<Flight>();
-
-		foreach (var flight1 in firstConnection)
-		{
-			var connectionFlight = secondConnection
-				.FindAll(flight2 => flight2.DepartureDestination == flight1.ArrivalDestination);
-
-			// ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-			if (connectionFlight == null) continue;
-
-			foreach (var flight2 in connectionFlight)
-			{
-				var joinFlight = CreateFlightFromConnection(flight1, flight2);
-
-				results.Add(joinFlight);
-			}
-		}
-
-		return results;
-	}
-
 
 	public List<Flight> GetFlightsDeparture(string departure)
 	{
@@ -186,55 +152,45 @@ public class FlightData : IFlightData
 		return results;
 	}
 
-	public bool BookFlight(BookingCreationDto request)
+	public List<Flight> GetFlightsConnection(DepartureArrivalRequest request)
 	{
-		var flight = _flights.Find(flight => flight.RouteId == request.RouteId);
-		if (flight == null) return false;
+		var flightsDeparture =
+			_flightNoItineraries.FindAll(flight => flight.DepartureDestination == request.DepartureRequest);
 
-		var itinerary = flight.Itineraries!.Find(itinerary => itinerary.FlightId == request.FlightId);
-		if (itinerary == null) return false;
+		var flightsArrival = _flightNoItineraries.FindAll(flight => flight.ArrivalDestination == request.ArrivalRequest);
 
-		if (itinerary.AvailableSeats <= request.NumberOfSeatsToBook) return false;
+		var results = new List<Flight>();
 
-		itinerary.AvailableSeats -= request.NumberOfSeatsToBook;
-		return true;
+		foreach (var flightDeparture in flightsDeparture)
+		foreach (var flightArrival in flightsArrival)
+			if (flightDeparture.ArrivalDestination == flightArrival.DepartureDestination)
+			{
+				var itineraryDeparture = _itineraries.FindAll(itinerary => itinerary.RouteId == flightDeparture.RouteId);
+				var itineraryArrival = _itineraries.FindAll(itinerary => itinerary.RouteId == flightArrival.RouteId);
+				var tempFlightNoItinerary = new FlightNoItinerary(flightDeparture, flightArrival);
+				var tempItineraies = JoinItineraries(itineraryDeparture, itineraryArrival);
+				var tempFlight = new Flight(tempFlightNoItinerary, tempItineraies);
+
+				results.Add(tempFlight);
+			}
+
+		return results;
 	}
 
-
-	private Flight CreateFlightFromConnection(Flight flight1, Flight flight2)
+	public List<Itinerary> JoinItineraries(List<Itinerary> itineraries1, List<Itinerary> itineraries2)
 	{
-		var result = new Flight
+		var result = new List<Itinerary>();
+
+		foreach (var itinerary1 in itineraries1)
+		foreach (var itinerary2 in itineraries2)
 		{
-			RouteId = flight1.RouteId + "," + flight2.RouteId,
-			DepartureDestination = flight1.DepartureDestination,
-			ArrivalDestination = flight2.ArrivalDestination,
-			Itineraries = new List<Itinerary>()
-		};
+			if (itinerary1.ArrivalAt > itinerary2.DepartureAt) continue;
+			if (itinerary1.AvailableSeats < 1 || itinerary2.AvailableSeats < 1) continue;
 
-		if (flight1.Itineraries != null)
+			var tempItinerary = new Itinerary(itinerary1, itinerary2);
 
-			foreach (var itinerary1 in flight1.Itineraries)
-			{
-				if (flight2.Itineraries == null) continue;
-
-				foreach (var itinerary2 in flight2.Itineraries
-					         .Where(itinerary2 => itinerary1.ArrivalAt.AddHours(2) <= itinerary2.DepartureAt)
-					         .Where(itinerary2 => Math.Min(itinerary1.AvailableSeats, itinerary2.AvailableSeats) >= 1))
-					result.Itineraries.Add(new Itinerary
-					{
-						FlightId = itinerary1.FlightId + "," + itinerary2.FlightId,
-						DepartureAt = itinerary1.DepartureAt,
-						ArrivalAt = itinerary2.ArrivalAt,
-						AwaitingTime = new DateTime(itinerary2.DepartureAt.Ticks - itinerary1.ArrivalAt.Ticks),
-						AvailableSeats = Math.Min(itinerary1.AvailableSeats, itinerary2.AvailableSeats),
-						Prices = new Price
-						{
-							Currency = itinerary1.Prices.Currency,
-							Adult = itinerary1.Prices.Adult + itinerary2.Prices.Adult,
-							Child = itinerary1.Prices.Child + itinerary2.Prices.Child
-						}
-					});
-			}
+			result.Add(tempItinerary);
+		}
 
 		return result;
 	}

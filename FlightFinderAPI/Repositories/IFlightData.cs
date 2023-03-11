@@ -1,5 +1,4 @@
-﻿using FlightFinderAPI.Contracts.Data.Incoming;
-using FlightFinderAPI.Contracts.Requests;
+﻿using FlightFinderAPI.Contracts.Requests;
 using FlightFinderAPI.Domain;
 
 namespace FlightFinderAPI.Repositories;
@@ -14,5 +13,4 @@ public interface IFlightData
 	List<Flight> GetFlightsArrival(string arrival);
 	List<Itinerary> GetFlightsBaseOnDepartureTime(FlightDepartureTimeRequest request);
 	List<Itinerary> GetFlightsBaseOnArrivalTime(FlightArrivalTimeRequest request);
-	bool BookFlight(BookingCreationDto request);
 }
