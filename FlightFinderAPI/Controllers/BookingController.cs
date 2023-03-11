@@ -1,5 +1,5 @@
 using AutoMapper;
-using FlightFinderAPI.Contracts.Data.Incoming;
+using FlightFinderAPI.Contracts.Incoming;
 using FlightFinderAPI.Domain;
 using FlightFinderAPI.Repositories;
 using FlightFinderAPI.Services.Context;

@@ -7,30 +7,28 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AutoMapper" Version="12.0.1"/>
-        <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0"/>
-        <PackageReference Include="FluentValidation.AspNetCore" Version="11.0.1"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.14"/>
+        <PackageReference Include="AutoMapper" Version="12.0.1" />
+        <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
+        <PackageReference Include="FluentValidation.AspNetCore" Version="11.0.1" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.14" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.14">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.14"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.14"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.14" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.14" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.14">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1"/>
-        <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.12"/>
-        <PackageReference Include="Serilog.AspNetCore" Version="6.1.0"/>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1" />
+        <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.12" />
+        <PackageReference Include="Serilog.AspNetCore" Version="6.1.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Contracts\Data\Outgoing"/>
-        <Folder Include="Contracts\Responses"/>
-        <Folder Include="Logs"/>
+        <Folder Include="Logs" />
     </ItemGroup>
 
 </Project>

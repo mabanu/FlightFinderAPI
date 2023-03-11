@@ -1,4 +1,4 @@
-﻿namespace FlightFinderAPI.Contracts.Data;
+﻿namespace FlightFinderAPI.Contracts.Responses;
 
 public class UserDto
 {

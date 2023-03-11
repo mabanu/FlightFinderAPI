@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using FlightFinderAPI.Contracts.Data;
-using FlightFinderAPI.Contracts.Data.Incoming;
+using FlightFinderAPI.Contracts.Incoming;
+using FlightFinderAPI.Contracts.Responses;
 using FlightFinderAPI.Domain;
 
 namespace FlightFinderAPI.Mapping;
