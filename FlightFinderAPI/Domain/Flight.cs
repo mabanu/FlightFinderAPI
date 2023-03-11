@@ -4,6 +4,18 @@ namespace FlightFinderAPI.Domain;
 
 public class Flight
 {
+	public Flight()
+	{
+	}
+
+	public Flight(FlightNoItinerary flightNoItinerary, List<Itinerary> itineraries)
+	{
+		RouteId = flightNoItinerary.RouteId;
+		DepartureDestination = flightNoItinerary.DepartureDestination;
+		ArrivalDestination = flightNoItinerary.ArrivalDestination;
+		Itineraries = itineraries;
+	}
+
 	[JsonPropertyName("route_id")] public string RouteId { get; set; } = null!;
 
 	[JsonPropertyName("departureDestination")]

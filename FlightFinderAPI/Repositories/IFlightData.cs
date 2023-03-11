@@ -1,4 +1,5 @@
-﻿using FlightFinderAPI.Contracts.Requests;
+﻿using FlightFinderAPI.Contracts.Data.Incoming;
+using FlightFinderAPI.Contracts.Requests;
 using FlightFinderAPI.Domain;
 
 namespace FlightFinderAPI.Repositories;
@@ -6,10 +7,12 @@ namespace FlightFinderAPI.Repositories;
 public interface IFlightData
 {
 	List<Flight> GetFlights();
-	List<Flight> GetFlightsBaseOnLocation(DepartureArrivalRequest request);
+	bool BookFlightSeats(string routeId, string flightId, int numberOfSeats);
+	List<Itinerary> GetFlightsBaseOnLocation(DepartureArrivalRequest request);
 	List<Flight> GetFlightsConnection(DepartureArrivalRequest request);
 	List<Flight> GetFlightsDeparture(string departure);
 	List<Flight> GetFlightsArrival(string arrival);
-	List<Flight> GetFlightsBaseOnTime(FlightTimeRequest request);
-	bool BookFlight(BookFlightRequest request);
+	List<Itinerary> GetFlightsBaseOnDepartureTime(FlightDepartureTimeRequest request);
+	List<Itinerary> GetFlightsBaseOnArrivalTime(FlightArrivalTimeRequest request);
+	bool BookFlight(BookingCreationDto request);
 }

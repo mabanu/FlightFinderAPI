@@ -1,4 +1,7 @@
+using AutoMapper;
+using FlightFinderAPI.Contracts.Data.Incoming;
 using FlightFinderAPI.Domain;
+using FlightFinderAPI.Repositories;
 using FlightFinderAPI.Services.Context;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,13 +13,16 @@ namespace FlightFinderAPI.Controllers;
 public class BookingController : ControllerBase
 {
 	private readonly AppDbContext _context;
+	private readonly IFlightData _flightData;
+	private readonly IMapper _mapper;
 
-	public BookingController(AppDbContext context)
+	public BookingController(AppDbContext context, IMapper mapper, IFlightData flightData)
 	{
 		_context = context;
+		_mapper = mapper;
+		_flightData = flightData;
 	}
 
-	// GET: api/Booking
 	[HttpGet]
 	public async Task<ActionResult<IEnumerable<Booking>>> GetBookings()
 	{
@@ -25,7 +31,6 @@ public class BookingController : ControllerBase
 		return await _context.Bookings.ToListAsync();
 	}
 
-	// GET: api/Booking/5
 	[HttpGet("{id}")]
 	public async Task<ActionResult<Booking>> GetBooking(Guid id)
 	{
@@ -38,8 +43,6 @@ public class BookingController : ControllerBase
 		return booking;
 	}
 
-	// PUT: api/Booking/5
-	// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
 	[HttpPut("{id}")]
 	public async Task<IActionResult> PutBooking(Guid id, Booking booking)
 	{
@@ -61,20 +64,29 @@ public class BookingController : ControllerBase
 		return NoContent();
 	}
 
-	// POST: api/Booking
-	// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
 	[HttpPost]
-	public async Task<ActionResult<Booking>> PostBooking(Booking booking)
+	public async Task<ActionResult<List<Booking>>> PostBooking(BookingCreationDto bookingRequest)
 	{
 		// ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 		if (_context.Bookings == null) return Problem("Entity set 'AppDbContext.Bookings'  is null.");
-		_context.Bookings.Add(booking);
-		await _context.SaveChangesAsync();
 
-		return CreatedAtAction("GetBooking", new { id = booking.BookingId }, booking);
+		var results = new List<Booking>();
+		var bookingPossible = _flightData.BookFlightSeats(bookingRequest.RouteId, bookingRequest.FlightId,
+			bookingRequest.NumberOfSeatsToBook);
+
+		if (!bookingPossible) return StatusCode(406);
+		for (var i = 0; i < bookingRequest.NumberOfSeatsToBook; i++)
+		{
+			var bookingResult = _mapper.Map<Booking>(bookingRequest);
+			results.Add(bookingResult);
+
+			_context.Bookings.Add(bookingResult);
+			await _context.SaveChangesAsync();
+		}
+
+		return Ok(results);
 	}
 
-	// DELETE: api/Booking/5
 	[HttpDelete("{id}")]
 	public async Task<IActionResult> DeleteBooking(Guid id)
 	{

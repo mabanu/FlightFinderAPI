@@ -11,4 +11,5 @@ public class BookingCreationDto
 
 	// ReSharper disable once UnusedAutoPropertyAccessor.Global
 	public Guid UserId { get; set; }
+	public int NumberOfSeatsToBook { get; set; }
 }

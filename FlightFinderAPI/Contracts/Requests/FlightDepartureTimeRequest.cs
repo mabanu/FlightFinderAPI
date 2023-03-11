@@ -1,7 +1,7 @@
 ﻿namespace FlightFinderAPI.Contracts.Requests;
 
-public class FlightTimeRequest
+public class FlightDepartureTimeRequest
 {
 	public DateTime DepartureTime { get; set; }
-	public DateTime ArrivalTime { get; set; }
+	public string DepartureDestination { get; set; }
 }

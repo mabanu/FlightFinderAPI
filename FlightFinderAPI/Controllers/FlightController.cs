@@ -65,14 +65,25 @@ public class FlightController : ControllerBase
 		return Ok(result);
 	}
 
-	[HttpGet("time-routes")]
-	public ActionResult<List<Flight>> GetFlightBaseOnTime([FromQuery] FlightTimeRequest request)
+	[HttpGet("departure-time-routes")]
+	public ActionResult<List<Itinerary>> GetFlightBaseOnDepartureTime([FromQuery] FlightDepartureTimeRequest request)
 	{
-		var result = _flightData.GetFlightsBaseOnTime(request);
+		var results = _flightData.GetFlightsBaseOnDepartureTime(request);
 
 		// ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-		if (result == null) return NotFound();
+		if (results == null) return NotFound();
 
-		return Ok(result);
+		return Ok(results);
+	}
+
+	[HttpGet("arrival-time-routes")]
+	public ActionResult<List<Itinerary>> GetFlightBaseOnArrivalTime([FromQuery] FlightArrivalTimeRequest request)
+	{
+		var results = _flightData.GetFlightsBaseOnArrivalTime(request);
+
+		// ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+		if (results == null) return NotFound();
+
+		return Ok(results);
 	}
 }

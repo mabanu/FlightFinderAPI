@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using FlightFinderAPI.Contracts.Data.Incoming;
 using FlightFinderAPI.Contracts.Requests;
 using FlightFinderAPI.Domain;
 
@@ -6,41 +7,86 @@ namespace FlightFinderAPI.Repositories;
 
 public class FlightData : IFlightData
 {
+	private readonly List<FlightNoItinerary> _flightNoItineraries;
+
+	private readonly List<Flight> _flights;
+	private readonly List<Itinerary> _itineraries;
+
 	public FlightData()
 	{
 		List<Flight> flights;
+		var itineraries = new List<Itinerary>();
+		var flightNoItinerary = new List<FlightNoItinerary>();
 		using (var reader = new StreamReader(@"Services/Data/data.json"))
 		{
 			var json = reader.ReadToEnd();
 			flights = JsonSerializer.Deserialize<List<Flight>>(json)!;
 		}
 
-		Flights = flights;
-	}
+		foreach (var flight in flights)
+		{
+			var tempFlight = new FlightNoItinerary(flight);
 
-	private List<Flight> Flights { get; }
+			flightNoItinerary.Add(tempFlight);
+			if (flight.Itineraries == null) continue;
+			foreach (var itinerary in flight.Itineraries) itinerary.RouteId = flight.RouteId;
+			itineraries.AddRange(flight.Itineraries);
+		}
+
+		_flights = flights;
+		_flightNoItineraries = flightNoItinerary;
+		_itineraries = itineraries;
+	}
 
 	public List<Flight> GetFlights()
 	{
-		return Flights;
+		var flights = new List<Flight>();
+		foreach (var flight in _flightNoItineraries)
+		{
+			var allItinerary = _itineraries.FindAll(itinerary => itinerary.RouteId == flight.RouteId);
+			var tempFlight = new Flight(flight, allItinerary);
+			flights.Add(tempFlight);
+		}
+
+		return flights;
 	}
 
-	public List<Flight> GetFlightsBaseOnLocation(DepartureArrivalRequest request)
+	public bool BookFlightSeats(string routeId, string flightId, int numberOfSeats)
 	{
-		var results = Flights
-			.Where(flight => flight.DepartureDestination == request.DepartureRequest)
-			.Where(flight => flight.ArrivalDestination == request.ArrivalRequest)
-			.ToList();
+		var result =
+			_itineraries.FirstOrDefault(itinerary => itinerary.RouteId == routeId && itinerary.FlightId == flightId);
+
+		if (result == null) return false;
+		if (numberOfSeats >= result.AvailableSeats) return false;
+
+		result.AvailableSeats -= numberOfSeats;
+		return true;
+	}
+
+	public List<Itinerary> GetFlightsBaseOnLocation(DepartureArrivalRequest request)
+	{
+		var resultsFlight = _flightNoItineraries
+			.FindAll(flight => flight.DepartureDestination == request.DepartureRequest &&
+			                   flight.ArrivalDestination == request.ArrivalRequest);
+
+		var results = new List<Itinerary>();
+
+		foreach (var flight in resultsFlight)
+		{
+			var tempItinerary = _itineraries.FindAll(itinerary => itinerary.RouteId == flight.RouteId);
+
+			results.AddRange(tempItinerary);
+		}
 
 		return results;
 	}
 
 	public List<Flight> GetFlightsConnection(DepartureArrivalRequest request)
 	{
-		var firstConnection = Flights
+		var firstConnection = _flights
 			.Where(flight => flight.DepartureDestination == request.DepartureRequest)
 			.ToList();
-		var secondConnection = Flights
+		var secondConnection = _flights
 			.Where(flight => flight.ArrivalDestination == request.ArrivalRequest)
 			.ToList();
 
@@ -68,42 +114,84 @@ public class FlightData : IFlightData
 
 	public List<Flight> GetFlightsDeparture(string departure)
 	{
-		var results = Flights
+		var resultsFlight = _flightNoItineraries
 			.Where(flight => flight.DepartureDestination == departure)
 			.ToList();
+
+		var results = new List<Flight>();
+
+		foreach (var flight in resultsFlight)
+		{
+			var itineraries = _itineraries.FindAll(itineraries => itineraries.RouteId == flight.RouteId);
+
+			var tempFlight = new Flight(flight, itineraries);
+			results.Add(tempFlight);
+		}
 
 		return results;
 	}
 
 	public List<Flight> GetFlightsArrival(string arrival)
 	{
-		var results = Flights
-			.Where(flight => flight.ArrivalDestination == arrival)
+		var resultsFlight = _flightNoItineraries
+			.Where(flight => flight.DepartureDestination == arrival)
 			.ToList();
 
-		return results;
-	}
-
-	public List<Flight> GetFlightsBaseOnTime(FlightTimeRequest request)
-	{
 		var results = new List<Flight>();
 
-		foreach (var flight in Flights)
+		foreach (var flight in resultsFlight)
 		{
-			var res = flight.Itineraries!.FindAll(itinerary => itinerary.DepartureAt == request.DepartureTime);
-			flight.Itineraries = res;
-			results.Add(flight);
+			var itineraries = _itineraries.FindAll(itineraries => itineraries.RouteId == flight.RouteId);
+
+			var tempFlight = new Flight(flight, itineraries);
+			results.Add(tempFlight);
 		}
 
 		return results;
 	}
 
-	public bool BookFlight(BookFlightRequest request)
+	public List<Itinerary> GetFlightsBaseOnDepartureTime(FlightDepartureTimeRequest request)
 	{
-		var flight = Flights.Find(flight => flight.RouteId == request.RouteIdRequest);
+		var resultFlights =
+			_flightNoItineraries.FindAll(flight => flight.DepartureDestination == request.DepartureDestination);
+
+		var results = new List<Itinerary>();
+
+		foreach (var flight in resultFlights)
+		{
+			var tempItinerary = _itineraries.FindAll(itinerary =>
+				itinerary.RouteId == flight.RouteId && itinerary.DepartureAt == request.DepartureTime);
+
+			results.AddRange(tempItinerary);
+		}
+
+		return results;
+	}
+
+	public List<Itinerary> GetFlightsBaseOnArrivalTime(FlightArrivalTimeRequest request)
+	{
+		var resultFlights =
+			_flightNoItineraries.FindAll(flight => flight.DepartureDestination == request.ArrivalDestination);
+
+		var results = new List<Itinerary>();
+
+		foreach (var flight in resultFlights)
+		{
+			var tempItinerary = _itineraries.FindAll(itinerary =>
+				itinerary.RouteId == flight.RouteId && itinerary.DepartureAt == request.ArrivalTime);
+
+			results.AddRange(tempItinerary);
+		}
+
+		return results;
+	}
+
+	public bool BookFlight(BookingCreationDto request)
+	{
+		var flight = _flights.Find(flight => flight.RouteId == request.RouteId);
 		if (flight == null) return false;
 
-		var itinerary = flight.Itineraries!.Find(itinerary => itinerary.FlightId == request.FlightIdRequest);
+		var itinerary = flight.Itineraries!.Find(itinerary => itinerary.FlightId == request.FlightId);
 		if (itinerary == null) return false;
 
 		if (itinerary.AvailableSeats <= request.NumberOfSeatsToBook) return false;
