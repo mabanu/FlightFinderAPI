@@ -1,7 +1,8 @@
+using FlightFinderAPI.Contracts.Incoming;
 using FlightFinderAPI.Repositories;
 using FlightFinderAPI.Services.Context;
 using FlightFinderAPI.Validation;
-using FluentValidation.AspNetCore;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -17,14 +18,14 @@ builder.Host.UseSerilog((context, service, configuration) => configuration
 );
 
 builder.Services.AddSingleton<IFlightData, FlightData>();
+builder.Services.AddScoped<IValidator<UserCreationDto>, UserCreationDtoValidator>();
+builder.Services.AddScoped<IValidator<BookingCreationDto>, BookingCreationDtoValidator>();
+builder.Services.AddScoped<IValidator<UserUpdate>, UserUpdateValidator>();
+builder.Services.AddScoped<IValidator<BookingUpdate>, BookingUpdateValidator>();
 builder.Services.AddCors();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-builder.Services.AddControllers().AddFluentValidation(opt =>
-{
-	opt.RegisterValidatorsFromAssemblyContaining<Program>();
-	opt.DisableDataAnnotationsValidation = true;
-});
+builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -49,7 +50,7 @@ app.UseCors(opt => opt
 	.AllowAnyHeader());
 
 app.UseAuthorization();
-app.UseMiddleware<ValidationExceptionMiddleware>();
+
 app.MapControllers();
 
 app.Run();

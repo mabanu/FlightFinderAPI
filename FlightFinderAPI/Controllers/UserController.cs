@@ -3,6 +3,7 @@ using FlightFinderAPI.Contracts.Incoming;
 using FlightFinderAPI.Contracts.Responses;
 using FlightFinderAPI.Domain;
 using FlightFinderAPI.Services.Context;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,11 +15,16 @@ public class UserController : ControllerBase
 {
 	private readonly AppDbContext _context;
 	private readonly IMapper _mapper;
+	private readonly IValidator<UserUpdate> _userUpdateValidator;
+	private readonly IValidator<UserCreationDto> _userValidator;
 
-	public UserController(AppDbContext context, IMapper mapper)
+	public UserController(AppDbContext context, IMapper mapper, IValidator<UserCreationDto> userValidator,
+		IValidator<UserUpdate> userUpdateValidator)
 	{
 		_context = context;
 		_mapper = mapper;
+		_userValidator = userValidator;
+		_userUpdateValidator = userUpdateValidator;
 	}
 
 	// GET: api/User
@@ -66,6 +72,15 @@ public class UserController : ControllerBase
 	[HttpPut("{id}")]
 	public async Task<IActionResult> PutUser(Guid id, UserUpdate userUpdate)
 	{
+		var validator = await _userUpdateValidator.ValidateAsync(userUpdate);
+
+		if (!validator.IsValid)
+		{
+			var errorMessage = validator.Errors.Select(error => error.ErrorMessage).ToList();
+
+			return BadRequest(errorMessage);
+		}
+
 		if (id != userUpdate.UserId) return BadRequest();
 
 		var user = _mapper.Map<User>(userUpdate);
@@ -89,6 +104,15 @@ public class UserController : ControllerBase
 	[HttpPost]
 	public async Task<ActionResult<UserCreationDto>> PostUser([FromBody] UserCreationDto userCreation)
 	{
+		var validator = await _userValidator.ValidateAsync(userCreation);
+
+		if (!validator.IsValid)
+		{
+			var errorMessage = validator.Errors.Select(error => error.ErrorMessage).ToList();
+
+			return BadRequest(errorMessage);
+		}
+
 		// ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 		if (_context.Users == null) return Problem("Entity set 'AppDbContext.Users'  is null.");
 		var user = _mapper.Map<User>(userCreation);

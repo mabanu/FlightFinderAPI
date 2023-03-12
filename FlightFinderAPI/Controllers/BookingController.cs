@@ -4,6 +4,7 @@ using FlightFinderAPI.Contracts.Responses;
 using FlightFinderAPI.Domain;
 using FlightFinderAPI.Repositories;
 using FlightFinderAPI.Services.Context;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,15 +14,20 @@ namespace FlightFinderAPI.Controllers;
 [ApiController]
 public class BookingController : ControllerBase
 {
+	private readonly IValidator<BookingCreationDto> _bookingCreationDtoValidator;
+	private readonly IValidator<BookingUpdate> _bookingUpdateValidator;
 	private readonly AppDbContext _context;
 	private readonly IFlightData _flightData;
 	private readonly IMapper _mapper;
 
-	public BookingController(AppDbContext context, IMapper mapper, IFlightData flightData)
+	public BookingController(AppDbContext context, IMapper mapper, IFlightData flightData,
+		IValidator<BookingCreationDto> bookingCreationDtoValidator, IValidator<BookingUpdate> bookingUpdateValidator)
 	{
 		_context = context;
 		_mapper = mapper;
 		_flightData = flightData;
+		_bookingCreationDtoValidator = bookingCreationDtoValidator;
+		_bookingUpdateValidator = bookingUpdateValidator;
 	}
 
 	[HttpGet]
@@ -53,6 +59,15 @@ public class BookingController : ControllerBase
 	[HttpPut("{id}")]
 	public async Task<IActionResult> PutBooking(Guid id, BookingUpdate bookingUpdate)
 	{
+		var bookingUpdateValidator = await _bookingUpdateValidator.ValidateAsync(bookingUpdate);
+
+		if (!bookingUpdateValidator.IsValid)
+		{
+			var errors = bookingUpdateValidator.Errors.Select(error => error.ErrorMessage).ToList();
+
+			return BadRequest(errors);
+		}
+
 		if (id != bookingUpdate.BookingId) return BadRequest();
 
 		var booking = _mapper.Map<Booking>(bookingUpdate);
@@ -76,6 +91,15 @@ public class BookingController : ControllerBase
 	[HttpPost]
 	public async Task<ActionResult<List<BookingResponse>>> PostBooking(BookingCreationDto bookingRequest)
 	{
+		var bookingRequestValidator = await _bookingCreationDtoValidator.ValidateAsync(bookingRequest);
+
+		if (!bookingRequestValidator.IsValid)
+		{
+			var errors = bookingRequestValidator.Errors.Select(error => error.ErrorMessage).ToList();
+
+			return BadRequest(errors);
+		}
+
 		// ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 		if (_context.Bookings == null) return Problem("Entity set 'AppDbContext.Bookings'  is null.");
 
