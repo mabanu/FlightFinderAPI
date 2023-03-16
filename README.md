@@ -24,8 +24,33 @@
    
    ## Description
    
-  Todo
+   This is a backend project for a Booking, Momondo kind of app.
+   It is an API that fetch mock data from a .json file and manage diferent search logic for        different endpoints.
+   The flights controller will give you
+         - All filgths
+         - All routes between two locations
+         - Give flight connections when there is not a direct flight and calculate the waiting time and the total trip time.
+         - All flights departure from a given location
+         - All flights arrivals from a given location
+         - All flights departure from a given location and time
+         - All flights arrivals from a given location and time
+         
+   We also have CRUD controller for Booking information and Users.
+   
+  ## Implimentation
+  
+      * Rest API
+      * InMemory database for flight data
+      * SQLite database
+      * Entity Framwork
+      * Mapping with AutoMapper
+      * Validation with Fluent Validation
+      * Serilog logging
   
    ## Look
    
-   ToDo
+   ![1](https://user-images.githubusercontent.com/64554427/225594594-761385aa-403a-412f-8be4-f2b375c51565.png)
+![2](https://user-images.githubusercontent.com/64554427/225594610-d5d5f902-3c70-4f02-ad5b-1fe8518a3a59.png)
+![3](https://user-images.githubusercontent.com/64554427/225594627-68acb823-5140-4107-8f2d-6fa9da765f38.png)
+![4](https://user-images.githubusercontent.com/64554427/225594638-7f6d7146-7680-436f-8cc7-a1872e9dea6f.png)
+
