@@ -28,13 +28,13 @@
    It is an API that fetch mock data from a .json file and manage diferent search logic for        different endpoints.
    The flights controller will give you
    
-         - All filgths
-         - All routes between two locations
-         - Give flight connections when there is not a direct flight and calculate the waiting time and the total trip time.
-         - All flights departure from a given location
-         - All flights arrivals from a given location
-         - All flights departure from a given location and time
-         - All flights arrivals from a given location and time
+      - All filgths
+      - All routes between two locations
+      - Give flight connections when there is not a direct flight and calculate the waiting time and the total trip time.
+      - All flights departure from a given location
+      - All flights arrivals from a given location
+      - All flights departure from a given location and time
+      - All flights arrivals from a given location and time
          
    We also have CRUD controller for Booking information and Users.
    
