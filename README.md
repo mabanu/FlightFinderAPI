@@ -24,7 +24,7 @@
    
    ## Description
    
-   This is a backend project for a Booking, Momondo kind of app.
+   This is a one week backend project for a Booking, Momondo kind of app.
    It is an API that fetch mock data from a .json file and manage diferent search logic for        different endpoints.
    The flights controller will give you
    
